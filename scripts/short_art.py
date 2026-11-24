@@ -219,34 +219,36 @@ def emu(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 260,
     # x keeps them from moving in lockstep.
     if pose == "run":
         x += 0.20 * h * math.sin(2 * math.pi * TICK * 0.55 + x * 0.004)
-    body_c = (x, y - 0.47 * h)
-    brx, bry = 0.255 * h, 0.185 * h
-    head_c = (x + s * 0.30 * h, y - 0.885 * h)
-    hr = 0.088 * h
+    # Ratite proportions: small head high on a long neck, flat oval body,
+    # long legs. The old short legs + tail fan read as a chicken.
+    body_c = (x, y - 0.56 * h)
+    brx, bry = 0.245 * h, 0.155 * h
+    head_c = (x + s * 0.34 * h, y - 0.94 * h)
+    hr = 0.075 * h
 
     if pose == "run":
-        body_c = (x, y - 0.44 * h)
-        head_c = (x + s * 0.38 * h, y - 0.84 * h)
-        hip_l = (x - s * 0.04 * h, y - 0.33 * h)
-        knee_l = (x - s * 0.20 * h, y - 0.20 * h)
-        foot_l = (x - s * 0.30 * h, y - 0.02 * h)
-        hip_r = (x + s * 0.05 * h, y - 0.33 * h)
-        knee_r = (x + s * 0.16 * h, y - 0.16 * h)
-        foot_r = (x + s * 0.24 * h, y)
+        body_c = (x, y - 0.53 * h)
+        head_c = (x + s * 0.42 * h, y - 0.90 * h)
+        hip_l = (x - s * 0.04 * h, y - 0.44 * h)
+        knee_l = (x - s * 0.16 * h, y - 0.24 * h)
+        foot_l = (x - s * 0.28 * h, y - 0.02 * h)
+        hip_r = (x + s * 0.05 * h, y - 0.44 * h)
+        knee_r = (x + s * 0.14 * h, y - 0.22 * h)
+        foot_r = (x + s * 0.22 * h, y)
     elif pose == "look":
-        head_c = (x + s * 0.30 * h, y - 0.91 * h)
-        hip_l = (x - s * 0.05 * h, y - 0.33 * h)
-        knee_l = (x - s * 0.07 * h, y - 0.17 * h)
+        head_c = (x + s * 0.34 * h, y - 0.99 * h)
+        hip_l = (x - s * 0.05 * h, y - 0.44 * h)
+        knee_l = (x - s * 0.07 * h, y - 0.23 * h)
         foot_l = (x - s * 0.08 * h, y)
-        hip_r = (x + s * 0.05 * h, y - 0.33 * h)
-        knee_r = (x + s * 0.07 * h, y - 0.17 * h)
+        hip_r = (x + s * 0.05 * h, y - 0.44 * h)
+        knee_r = (x + s * 0.07 * h, y - 0.23 * h)
         foot_r = (x + s * 0.08 * h, y)
     else:
-        hip_l = (x - s * 0.05 * h, y - 0.33 * h)
-        knee_l = (x - s * 0.08 * h, y - 0.17 * h)
+        hip_l = (x - s * 0.05 * h, y - 0.44 * h)
+        knee_l = (x - s * 0.08 * h, y - 0.23 * h)
         foot_l = (x - s * 0.09 * h, y)
-        hip_r = (x + s * 0.05 * h, y - 0.33 * h)
-        knee_r = (x + s * 0.08 * h, y - 0.17 * h)
+        hip_r = (x + s * 0.05 * h, y - 0.44 * h)
+        knee_r = (x + s * 0.08 * h, y - 0.23 * h)
         foot_r = (x + s * 0.09 * h, y)
 
     # Per-frame motion: running legs cycle, the body bounces, and the head
@@ -268,12 +270,12 @@ def emu(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 260,
         stroke(d, [hip, knee, foot], INK, LW * 1.9)
         _foot(d, foot[0], foot[1], s, 0.055 * h)
 
-    # tail fan
-    for k, ang in enumerate((6, 22, 38)):
-        a = math.radians(180 - ang + 5 * g) if s > 0 else math.radians(ang + 5 * g)
-        base = (body_c[0] - s * 0.17 * h, body_c[1] - 0.01 * h)
-        tip = (base[0] + 0.17 * h * math.cos(a), base[1] - 0.17 * h * math.sin(a))
-        outlined_stroke(d, [base, tip], fill, 0.042 * h)
+    # short drooping tail tuft - emus do NOT have a turkey-style tail fan
+    for k, dy in enumerate((0.01, 0.05, 0.09)):
+        base = (body_c[0] - s * 0.21 * h, body_c[1] - 0.01 * h)
+        tip = (base[0] - s * (0.11 + 0.02 * k) * h + 0.02 * h * g,
+               base[1] + dy * h)
+        outlined_stroke(d, [base, tip], fill, 0.032 * h)
 
     # body
     d.ellipse([px(body_c[0] - brx), px(body_c[1] - bry),
@@ -383,34 +385,53 @@ def fence(d: ImageDraw.ImageDraw, x: float, y: float, n: int = 5,
 def machine_gun(d: ImageDraw.ImageDraw, x: float, y: float, s: float = 1.0,
                 flash: bool = False, aim: float = 0.0) -> None:
     """Tripod-mounted Lewis gun. (x,y) is the ground point."""
-    apex = (x, y - 240 * s)
-    for dx in (-95, 0, 95):
-        stroke(d, [(x + dx * s, y), apex], INK, LW * 1.5)
-    # stock
-    poly(d, [(x - 120 * s, apex[1] - 30 * s), (x - 70 * s, apex[1] - 56 * s),
-             (x - 70 * s, apex[1] + 8 * s), (x - 120 * s, apex[1] + 22 * s)], fill=WARM)
-    # receiver
-    shape(d, "rrect", (x - 78 * s, apex[1] - 54 * s, x + 92 * s, apex[1] + 20 * s), fill=BLUE)
-    # barrel
-    barrel_end = (x + 300 * s, apex[1] - 34 * s + aim * 80 * s)
-    outlined_stroke(d, [(x + 80 * s, apex[1] - 24 * s), barrel_end], INK, LW * 3.0)
-    # cooling jacket rings
-    for i in range(4):
-        t = 0.30 + i * 0.15
-        bx = x + 80 * s + (barrel_end[0] - x - 80 * s) * t
-        by = apex[1] - 24 * s + (barrel_end[1] - apex[1] + 24 * s) * t
-        stroke(d, [(bx, by - 15 * s), (bx, by + 15 * s)], WARM, LW * 1.3)
-    # ammo drum
-    d.ellipse([px(x - 34 * s), px(apex[1] - 100 * s), px(x + 48 * s), px(apex[1] - 30 * s)],
+    apex = (x, y - 235 * s)
+    # tripod legs, splayed with flat feet
+    for dx in (-105, 0, 105):
+        stroke(d, [(x + dx * s, y), (x + dx * 0.22 * s, apex[1] + 18 * s)], INK, LW * 1.8)
+        stroke(d, [(x + dx * s - 16 * s, y), (x + dx * s + 16 * s, y)], INK, LW * 2.2)
+    d.ellipse([px(x - 13 * s), px(apex[1] - 1 * s),
+               px(x + 13 * s), px(apex[1] + 25 * s)], fill=WARM, outline=INK, width=int(LW))
+    # wooden stock
+    poly(d, [(x - 185 * s, apex[1] - 44 * s), (x - 108 * s, apex[1] - 70 * s),
+             (x - 108 * s, apex[1] + 16 * s), (x - 185 * s, apex[1] + 34 * s)], fill=WARM)
+    # long receiver with a dark outline - not a camera body
+    shape(d, "rrect", (x - 115 * s, apex[1] - 62 * s,
+                       x + 110 * s, apex[1] + 30 * s), fill=INK)
+    shape(d, "rect", (x - 100 * s, apex[1] - 50 * s,
+                      x + 95 * s, apex[1] + 14 * s), fill=BLUE)
+    # unmistakably long barrel with a ribbed cooling jacket
+    bx0, by0 = x + 100 * s, apex[1] - 22 * s
+    bx1, by1 = x + 460 * s, by0 - 28 * s + aim * 95 * s
+    outlined_stroke(d, [(bx0, by0), (bx1, by1)], INK, 24 * s)
+    for i in range(7):
+        t = 0.08 + i * 0.12
+        bx = bx0 + (bx1 - bx0) * t
+        by = by0 + (by1 - by0) * t
+        stroke(d, [(bx, by - 20 * s), (bx, by + 20 * s)], WARM, LW * 1.5)
+    outlined_stroke(d, [(bx1 - 12 * s, by1), (bx1 + 26 * s, by1)], WARM, 30 * s)
+    # drum magazine on the left, with a cartridge belt feeding the receiver
+    dcx, dcy, dr = x - 62 * s, apex[1] - 92 * s, 52 * s
+    d.ellipse([px(dcx - dr), px(dcy - dr), px(dcx + dr), px(dcy + dr)],
               fill=WARM, outline=INK, width=int(LW))
-    dot(d, x + 7 * s, apex[1] - 65 * s, 8 * s, INK)
+    for k in range(6):
+        a = k * math.pi / 3
+        stroke(d, [(dcx, dcy),
+                   (dcx + dr * 0.78 * math.cos(a), dcy + dr * 0.78 * math.sin(a))],
+               INK, LW * 0.8)
+    for k in range(5):
+        cx = dcx + 26 * s + k * 26 * s
+        shape(d, "rect", (cx, apex[1] - 72 * s, cx + 18 * s, apex[1] - 52 * s),
+              fill=WARM, w=LW * 0.7)
+    # rear sight
+    stroke(d, [(x + 40 * s, apex[1] - 62 * s), (x + 40 * s, apex[1] - 92 * s)], INK, LW * 1.4)
     if flash:
-        fx, fy = barrel_end
+        fx, fy = bx1 + 26 * s, by1
         pulse = 0.55 + 0.45 * abs(phase(9.0))
         pts = []
         for i in range(10):
             ang = -math.pi / 2 + i * math.pi / 5
-            rad = (80 if i % 2 == 0 else 34) * s * pulse
+            rad = (88 if i % 2 == 0 else 36) * s * pulse
             pts.append((fx + rad * math.cos(ang), fy + rad * math.sin(ang)))
         poly(d, pts, fill=ACCENT, outline=INK)
 
@@ -442,9 +463,16 @@ def hills(d: ImageDraw.ImageDraw, y: float, color=WARM, amp: float = 90,
     poly(d, pts, fill=color, outline=INK, w=LW)
 
 
-def ground(d: ImageDraw.ImageDraw, y: float = 1250, color=PAPER) -> None:
+def ground(d: ImageDraw.ImageDraw, y: float = 1250, color=PAPER,
+           field: bool = False) -> None:
     d.rectangle([0, px(y), px(1080), px(2400)], fill=color)
     stroke(d, [(0, y), (1080, y)], INK, LW)
+    if field:
+        # A crop horizon, not an empty desert: staggered wheat behind the action.
+        for i in range(24):
+            x = 26 + i * 45 + 11 * math.sin(i * 2.1)
+            hh = 64 + 34 * ((i * 7) % 5) / 4
+            wheat(d, x, y + 16, hh, WARM)
 
 
 def dust(d: ImageDraw.ImageDraw, x: float, y: float, r: float, color=WARM) -> None:
@@ -491,7 +519,7 @@ def s01a(d):
     """Wide: lone gunner faces a line of emus, low sun."""
     sun(d, 800, 1105, 135)
     hills(d, 1250, WARM, 70, 0.6)
-    ground(d, 1250)
+    ground(d, 1250, PAPER, field=True)
     for i, x in enumerate((640, 705, 770, 835, 900, 960)):
         emu(d, x, 1255, 110 + (i % 3) * 8, pose="look")
     shadow(d, 350, 1580, 160)
@@ -530,7 +558,7 @@ def s02a(d):
     """Wide: emus pour through a broken fence into wheat."""
     sun(d, 180, 380, 90)
     hills(d, 1150, WARM, 80, 2.2)
-    ground(d, 1150)
+    ground(d, 1150, PAPER, field=True)
     for i, (x, h) in enumerate(((140, 120), (230, 140), (330, 110), (430, 135),
                                 (540, 115), (650, 130), (760, 110), (870, 135),
                                 (960, 120))):
@@ -626,7 +654,7 @@ def s03b(d):
 def s04a(d):
     """Wide: the gun team sets up on the flock at the waterhole."""
     hills(d, 1180, WARM, 60, 4.0)
-    ground(d, 1180)
+    ground(d, 1180, PAPER, field=True)
     d.ellipse([px(560), px(1390), px(1000), px(1535)], fill=BLUE, outline=INK, width=int(LW))
     for i, (x, h) in enumerate(((600, 140), (680, 152), (760, 136), (840, 150), (920, 142))):
         emu(d, x, 1400 + (i % 2) * 18, h, pose="look")
@@ -669,7 +697,7 @@ def s05a(d):
     """Chaos: muzzle flash, emus scatter."""
     sun(d, 540, 300, 110)
     hills(d, 1050, WARM, 60, 3.0)
-    ground(d, 1050)
+    ground(d, 1050, PAPER, field=True)
     for x, y, h, fl in ((120, 1500, 220, False), (250, 1420, 200, True),
                         (820, 1480, 210, False), (960, 1380, 190, True),
                         (400, 1560, 160, False), (700, 1600, 170, True),
@@ -696,7 +724,7 @@ def s05b(d):
 def s06a(d):
     """Wide: the gun jams, emus run straight past."""
     hills(d, 1120, WARM, 70, 5.0)
-    ground(d, 1120)
+    ground(d, 1120, PAPER, field=True)
     for x, h, fl in ((80, 190, False), (300, 210, True),
                      (760, 200, False), (980, 180, True)):
         emu(d, x, 1370, h, pose="run", flip=fl)
@@ -761,7 +789,7 @@ def s07b(d):
     """Wide: emus radiate outward, one soldier alone."""
     sun(d, 540, 280, 90)
     hills(d, 1000, WARM, 60, 2.0)
-    ground(d, 1000)
+    ground(d, 1000, PAPER, field=True)
     ring = [(180, 1180, 155), (380, 1080, 145), (700, 1080, 150), (900, 1180, 155),
             (120, 1480, 165), (330, 1560, 160), (750, 1560, 155), (960, 1460, 165),
             (520, 1740, 145)]
@@ -778,7 +806,7 @@ def s08a(d):
     """Wide: the truck leaves, the emus hold the field."""
     sun(d, 880, 420, 120)
     hills(d, 1200, WARM, 80, 1.4)
-    ground(d, 1200)
+    ground(d, 1200, PAPER, field=True)
     truck(d, 20, 1650, 1.2)
     dust(d, 10, 1690, 130)
     for i, (x, h) in enumerate(((620, 200), (720, 215), (820, 195), (920, 210))):
