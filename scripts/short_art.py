@@ -24,6 +24,15 @@ WARM = (232, 192, 125)
 SS = 2  # supersample factor
 LW = 3 * SS  # uniform outline width
 
+# Animation clock in seconds. Drawing primitives read this so every scene can
+# move without every scene function needing its own time argument.
+TICK = 0.0
+
+
+def phase(hz: float, offset: float = 0.0) -> float:
+    """Smooth -1..1 oscillation at hz cycles per second."""
+    return math.sin(2 * math.pi * (TICK * hz + offset))
+
 
 def px(v: float) -> float:
     return v * SS
@@ -143,6 +152,22 @@ def stickman(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 300,
 
     al, ar, ll, lr = POSES.get(pose, POSES["stand"])
 
+    # Per-frame motion: running limbs cycle, aiming arms jitter with recoil,
+    # everything else gets a small idle breathe so no shot is a frozen bitmap.
+    p = phase(1.9 if pose == "run" else 0.8)
+    bob = 0.016 * h * (0.5 + 0.5 * p)
+    head = (head[0], head[1] - bob)
+    neck = (neck[0], neck[1] - bob)
+    hip = (hip[0], hip[1] - bob * 0.4)
+    if pose == "run":
+        al = (al[0], al[1] - 1.6 * p)
+        ar = (ar[0], ar[1] + 1.6 * p)
+        ll = (ll[0], ll[1] + 2.0 * p)
+        lr = (lr[0], lr[1] - 2.0 * p)
+    elif pose in ("aim", "kneel"):
+        recoil = 0.25 * phase(7.0)
+        ar = (ar[0] + recoil, ar[1] - 0.15 * recoil)
+
     def off(base, o):
         return (base[0] + o[0] * r, base[1] + o[1] * r)
 
@@ -190,6 +215,10 @@ def emu(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 260,
         pose: str = "stand", fill=WARM, flip: bool = False) -> None:
     """x,y = feet; h = total height."""
     s = -1 if flip else 1
+    # Running birds shuffle forward and back as a group; the phase offset from
+    # x keeps them from moving in lockstep.
+    if pose == "run":
+        x += 0.20 * h * math.sin(2 * math.pi * TICK * 0.55 + x * 0.004)
     body_c = (x, y - 0.47 * h)
     brx, bry = 0.255 * h, 0.185 * h
     head_c = (x + s * 0.30 * h, y - 0.885 * h)
@@ -220,6 +249,20 @@ def emu(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 260,
         knee_r = (x + s * 0.08 * h, y - 0.17 * h)
         foot_r = (x + s * 0.09 * h, y)
 
+    # Per-frame motion: running legs cycle, the body bounces, and the head
+    # bobs a little even when standing so the bird never looks like a cut-out.
+    g = phase(2.3 if pose == "run" else 0.75)
+    if pose == "run":
+        knee_l = (knee_l[0], knee_l[1] - 0.11 * h * g)
+        foot_l = (foot_l[0], foot_l[1] - 0.085 * h * max(0.0, g))
+        knee_r = (knee_r[0], knee_r[1] + 0.11 * h * g)
+        foot_r = (foot_r[0], foot_r[1] - 0.085 * h * max(0.0, -g))
+    bob = 0.028 * h * g
+    body_c = (body_c[0], body_c[1] - bob)
+    head_c = (head_c[0] + 0.012 * h * g, head_c[1] - 0.045 * h * g)
+    hip_l = (hip_l[0], hip_l[1] - bob)
+    hip_r = (hip_r[0], hip_r[1] - bob)
+
     # legs (behind body)
     for hip, knee, foot in ((hip_l, knee_l, foot_l), (hip_r, knee_r, foot_r)):
         stroke(d, [hip, knee, foot], INK, LW * 1.9)
@@ -227,7 +270,7 @@ def emu(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 260,
 
     # tail fan
     for k, ang in enumerate((6, 22, 38)):
-        a = math.radians(180 - ang) if s > 0 else math.radians(ang)
+        a = math.radians(180 - ang + 5 * g) if s > 0 else math.radians(ang + 5 * g)
         base = (body_c[0] - s * 0.17 * h, body_c[1] - 0.01 * h)
         tip = (base[0] + 0.17 * h * math.cos(a), base[1] - 0.17 * h * math.sin(a))
         outlined_stroke(d, [base, tip], fill, 0.042 * h)
@@ -307,12 +350,14 @@ def emu_top(d: ImageDraw.ImageDraw, x: float, y: float, s: float = 1.0,
 # ---------------------------------------------------------------- props
 def wheat(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 180,
           color=WARM) -> None:
-    stroke(d, [(x, y), (x, y - h)], INK, LW * 0.8)
+    sway = 0.035 * h * math.sin(2 * math.pi * TICK * 0.7 + x * 0.012)
+    stroke(d, [(x, y), (x + sway, y - h)], INK, LW * 0.8)
     for i in range(5):
-        yy = y - h + i * (h * 0.10)
-        stroke(d, [(x, yy), (x - 0.09 * h, yy - 0.06 * h)], color, LW * 1.5)
-        stroke(d, [(x, yy), (x + 0.09 * h, yy - 0.06 * h)], color, LW * 1.5)
-    stroke(d, [(x, y - h), (x, y - h - 0.10 * h)], color, LW * 1.7)
+        t = i / 5
+        cx, yy = x + sway * t, y - h + i * (h * 0.10)
+        stroke(d, [(cx, yy), (cx - 0.09 * h, yy - 0.06 * h)], color, LW * 1.5)
+        stroke(d, [(cx, yy), (cx + 0.09 * h, yy - 0.06 * h)], color, LW * 1.5)
+    stroke(d, [(x + sway, y - h), (x + sway * 1.15, y - h - 0.10 * h)], color, LW * 1.7)
 
 
 def fence(d: ImageDraw.ImageDraw, x: float, y: float, n: int = 5,
@@ -361,10 +406,11 @@ def machine_gun(d: ImageDraw.ImageDraw, x: float, y: float, s: float = 1.0,
     dot(d, x + 7 * s, apex[1] - 65 * s, 8 * s, INK)
     if flash:
         fx, fy = barrel_end
+        pulse = 0.55 + 0.45 * abs(phase(9.0))
         pts = []
         for i in range(10):
             ang = -math.pi / 2 + i * math.pi / 5
-            rad = (80 if i % 2 == 0 else 34) * s
+            rad = (80 if i % 2 == 0 else 34) * s * pulse
             pts.append((fx + rad * math.cos(ang), fy + rad * math.sin(ang)))
         poly(d, pts, fill=ACCENT, outline=INK)
 
@@ -402,10 +448,13 @@ def ground(d: ImageDraw.ImageDraw, y: float = 1250, color=PAPER) -> None:
 
 
 def dust(d: ImageDraw.ImageDraw, x: float, y: float, r: float, color=WARM) -> None:
+    drift = 0.28 * r * math.sin(2 * math.pi * TICK * 0.9)
+    grow = 1.0 + 0.16 * math.sin(2 * math.pi * TICK * 0.6)
     for dx, dy, k in ((-0.62, 0.10, 0.52), (0.02, -0.22, 0.66), (0.66, 0.12, 0.46)):
-        rr = r * k
-        d.ellipse([px(x + dx * r - rr), px(y + dy * r - rr),
-                   px(x + dx * r + rr), px(y + dy * r + rr)], fill=color)
+        rr = r * k * grow
+        cx = x + dx * r + drift * (1 + k)
+        d.ellipse([px(cx - rr), px(y + dy * r - rr),
+                   px(cx + rr), px(y + dy * r + rr)], fill=color)
     for k in (-1, 1):
         stroke(d, [(x + k * r * 0.40, y - r * 0.30),
                    (x + k * r * 0.26, y - r * 0.54)], INK, LW * 0.8)
@@ -414,9 +463,10 @@ def dust(d: ImageDraw.ImageDraw, x: float, y: float, r: float, color=WARM) -> No
 def speed_lines(d: ImageDraw.ImageDraw, x: float, y: float, n: int = 5,
                 dx: float = -1, dy: float = 0, length: float = 120,
                 gap: float = 46, color=ACCENT) -> None:
+    slide = 70.0 * math.sin(2 * math.pi * TICK * 2.6)
     for i in range(n):
-        ox = x + (i - n / 2) * gap * -dy
-        oy = y + (i - n / 2) * gap * dx
+        ox = x + (i - n / 2) * gap * -dy + dx * slide
+        oy = y + (i - n / 2) * gap * dx + dy * slide
         stroke(d, [(ox, oy), (ox + dx * length, oy + dy * length)], color, LW * 1.5)
 
 
@@ -767,8 +817,10 @@ SCENES = {
 SHIFT = 180
 
 
-def render_scene(key: str, size=(1080, 1920)) -> Image.Image:
+def render_scene(key: str, size=(1080, 1920), t: float = 0.0) -> Image.Image:
     w, h = size
+    global TICK
+    TICK = t
     img = Image.new("RGB", (w * SS, (h + SHIFT) * SS), PAPER)
     d = ImageDraw.Draw(img)
     SCENES[key](d)

@@ -4,8 +4,8 @@
   python scripts/make_short.py --story sample/emu_storyboard.json --out sample/emu
   python scripts/make_short.py --story sample/emu_storyboard.json --out sample/emu --preview 4
 
-Pipeline: TTS per shot -> exact durations -> flat-vector frames with Ken Burns
-+ karaoke captions -> h264 segments -> concat -> voice/music/SFX mix -> mux.
+Pipeline: TTS per shot -> exact durations -> animated flat-vector frames with
+camera moves + karaoke captions -> h264 segments -> concat -> mix -> mux.
 """
 from __future__ import annotations
 
@@ -191,7 +191,7 @@ def encode(ffmpeg: str, frames, out: Path) -> None:
         raise RuntimeError(f"ffmpeg failed: {err[-900:]}")
 
 
-def shot_frames(shot: dict, scenes: dict, upto: float | None = None):
+def shot_frames(shot: dict, upto: float | None = None):
     words = shot["narration"].split()
     lines = wrap_caption(words)
     times = word_times(words, shot["vo_dur"])
@@ -210,7 +210,10 @@ def shot_frames(shot: dict, scenes: dict, upto: float | None = None):
         else:
             key, mv = shot["scenes"][1], shot["moves"][1]
             p, fc = (tl - split_t) / max(1e-6, dur - split_t), fb
-        img = frame(scenes[key], mv, p, fc)
+        # Redraw the art every frame: the primitives animate from the clock,
+        # so characters actually move instead of sitting on a still image.
+        art = A.render_scene(key, t=tl)
+        img = frame(art, mv, p, fc)
         draw_caption(img, words, times, lines, tl)
         yield img
 
@@ -244,12 +247,9 @@ def main() -> None:
     print(f"total {total:.2f}s", flush=True)
     (out / "timing.json").write_text(json.dumps(shots, indent=2), encoding="utf-8")
 
-    keys = {k for s in shots for k in s["scenes"]}
-    scenes = {k: A.render_scene(k) for k in keys}
-
     if args.preview:
         for s in shots[: args.preview]:
-            img = list(shot_frames(s, scenes, upto=0.52 * s["seconds"]))[-1]
+            img = list(shot_frames(s, upto=0.52 * s["seconds"]))[-1]
             img.save(out / f"preview_{s['id']:02d}.png")
             print("preview", out / f"preview_{s['id']:02d}.png", flush=True)
         return
@@ -261,7 +261,7 @@ def main() -> None:
     for s in shots:
         seg = seg_dir / f"shot_{s['id']:02d}.mp4"
         print(f"encoding shot {s['id']}...", flush=True)
-        encode(ffmpeg, shot_frames(s, scenes), seg)
+        encode(ffmpeg, shot_frames(s), seg)
         segs.append(seg)
 
     concat = seg_dir / "concat.txt"
