@@ -123,19 +123,37 @@ def hat(d: ImageDraw.ImageDraw, x: float, y: float, r: float, kind: str) -> None
 
 
 # ---------------------------------------------------------------- stickman
+def _pose(ual, fal, uar, far, thl, shl, thr, shr):
+    """Bone vectors in units of body height: upper arm, forearm, thigh, shin."""
+    return dict(ual=ual, fal=fal, uar=uar, far=far,
+                thl=thl, shl=shl, thr=thr, shr=shr)
+
+
 POSES = {
-    "stand":  ((-1.9, 1.5), (1.9, 1.5), (-1.0, 4.2), (1.0, 4.2)),
-    "aim":    ((-1.0, 1.2), (2.5, 0.9), (-1.5, 4.0), (1.3, 4.2)),
-    "kneel":  ((-1.2, 1.4), (2.4, 1.0), (-1.6, 2.2), (1.4, 4.0)),
-    "run":    ((-2.4, 0.2), (2.2, 1.9), (-2.4, 3.3), (1.8, 4.4)),
-    "point":  ((-1.9, 1.4), (3.0, -0.2), (-1.0, 4.2), (1.0, 4.2)),
-    "plead":  ((-2.2, -0.4), (2.2, -0.4), (-1.0, 4.2), (1.0, 4.2)),
-    "slump":  ((-1.5, 2.6), (1.5, 2.6), (-1.0, 4.2), (1.0, 4.2)),
-    "carry":  ((-1.2, 0.4), (1.2, 0.4), (-1.0, 4.2), (1.0, 4.2)),
-    "cheer":  ((-2.4, -1.2), (2.4, -1.2), (-1.0, 4.2), (1.0, 4.2)),
-    "facepalm": ((-1.9, 1.5), (1.1, -1.6), (-1.0, 4.2), (1.0, 4.2)),
-    "push":   ((-1.0, 1.0), (2.6, 0.6), (-1.9, 4.2), (1.6, 4.2)),
-    "rest":   ((-0.55, 3.0), (0.55, 3.0), (-1.0, 4.2), (1.0, 4.2)),
+    "stand": _pose((-0.06, 0.15), (-0.02, 0.14), (0.06, 0.15), (0.02, 0.14),
+                   (-0.03, 0.24), (-0.01, 0.24), (0.03, 0.24), (0.01, 0.24)),
+    "aim": _pose((-0.09, 0.10), (0.30, -0.09), (0.09, 0.12), (0.27, -0.11),
+                 (-0.13, 0.17), (0.09, 0.26), (0.11, 0.17), (-0.03, 0.28)),
+    "kneel": _pose((-0.11, 0.09), (0.29, -0.08), (0.10, 0.11), (0.25, -0.07),
+                   (-0.15, 0.15), (0.12, 0.27), (0.13, 0.19), (0.01, 0.21)),
+    "run": _pose((-0.13, -0.05), (0.17, 0.13), (0.13, 0.11), (-0.11, 0.16),
+                 (-0.17, 0.16), (0.13, 0.26), (0.17, 0.15), (-0.10, 0.27)),
+    "point": _pose((-0.09, 0.13), (-0.03, 0.14), (0.17, -0.06), (0.27, -0.06),
+                   (-0.03, 0.24), (-0.01, 0.24), (0.03, 0.24), (0.01, 0.24)),
+    "plead": _pose((-0.15, 0.02), (0.10, -0.17), (0.15, 0.02), (-0.10, -0.17),
+                   (-0.03, 0.24), (-0.01, 0.24), (0.03, 0.24), (0.01, 0.24)),
+    "slump": _pose((-0.10, 0.17), (-0.03, 0.13), (0.10, 0.17), (0.03, 0.13),
+                   (-0.05, 0.22), (-0.02, 0.25), (0.05, 0.22), (0.02, 0.25)),
+    "carry": _pose((-0.07, 0.15), (0.23, -0.05), (0.07, 0.15), (0.23, -0.05),
+                   (-0.04, 0.24), (-0.01, 0.24), (0.04, 0.24), (0.01, 0.24)),
+    "cheer": _pose((-0.15, -0.14), (-0.05, -0.19), (0.15, -0.14), (0.05, -0.19),
+                   (-0.03, 0.24), (-0.01, 0.24), (0.03, 0.24), (0.01, 0.24)),
+    "facepalm": _pose((-0.08, 0.15), (-0.02, 0.14), (0.15, -0.11), (-0.17, -0.14),
+                      (-0.03, 0.24), (-0.01, 0.24), (0.03, 0.24), (0.01, 0.24)),
+    "push": _pose((-0.07, 0.10), (0.30, -0.05), (0.07, 0.10), (0.30, -0.05),
+                  (-0.14, 0.20), (0.09, 0.25), (0.14, 0.20), (-0.09, 0.25)),
+    "rest": _pose((-0.14, -0.12), (0.12, -0.11), (0.14, -0.12), (-0.12, -0.11),
+                  (-0.04, 0.24), (-0.01, 0.24), (0.04, 0.24), (0.01, 0.24)),
 }
 
 
@@ -144,38 +162,71 @@ def stickman(d: ImageDraw.ImageDraw, x: float, y: float, h: float = 300,
              hat_kind: str | None = None, eyes: bool = True,
              mouth: str | None = None, brow: str | None = None,
              head_fill=None) -> None:
-    """x,y = point between the feet; h = total height."""
-    r = 0.105 * h
-    head = (x, y - 0.795 * h)
-    neck = (x, y - 0.685 * h)
-    hip = (x, y - 0.435 * h)
+    """x,y = point between the feet; h = total height.
 
-    al, ar, ll, lr = POSES.get(pose, POSES["stand"])
-
-    # Per-frame motion: running limbs cycle, aiming arms jitter with recoil,
-    # everything else gets a small idle breathe so no shot is a frozen bitmap.
+    Articulated rig: one stick per long bone (upper arm/forearm, thigh/shin),
+    joint dots, round hands/feet, and a solid torso block instead of a spine line.
+    """
+    P = POSES.get(pose, POSES["stand"])
     p = phase(1.9 if pose == "run" else 0.8)
-    bob = 0.016 * h * (0.5 + 0.5 * p)
-    head = (head[0], head[1] - bob)
-    neck = (neck[0], neck[1] - bob)
-    hip = (hip[0], hip[1] - bob * 0.4)
+    bob = 0.014 * h * (0.5 + 0.5 * p)
+    gy = y - bob
+    r = 0.10 * h
+    head = (x, gy - 0.88 * h)
+    sy, hy = gy - 0.74 * h, gy - 0.48 * h
+    shoulders = [(x - 0.12 * h, sy), (x + 0.12 * h, sy)]
+    hips = [(x - 0.085 * h, hy), (x + 0.085 * h, hy)]
+
+    def vec(v, dx=0.0, dy=0.0):
+        return (v[0] * h + dx, v[1] * h + dy)
+
+    ual, fal = vec(P["ual"]), vec(P["fal"])
+    uar, far = vec(P["uar"]), vec(P["far"])
+    thl, shl = vec(P["thl"]), vec(P["shl"])
+    thr, shr = vec(P["thr"]), vec(P["shr"])
     if pose == "run":
-        al = (al[0], al[1] - 1.6 * p)
-        ar = (ar[0], ar[1] + 1.6 * p)
-        ll = (ll[0], ll[1] + 2.0 * p)
-        lr = (lr[0], lr[1] - 2.0 * p)
+        ual = (ual[0], ual[1] - 0.05 * h * p)
+        fal = (fal[0], fal[1] - 0.04 * h * p)
+        uar = (uar[0], uar[1] + 0.05 * h * p)
+        far = (far[0], far[1] + 0.04 * h * p)
+        thl = (thl[0], thl[1] + 0.06 * h * p)
+        shl = (shl[0], shl[1] + 0.05 * h * p)
+        thr = (thr[0], thr[1] - 0.06 * h * p)
+        shr = (shr[0], shr[1] - 0.05 * h * p)
     elif pose in ("aim", "kneel"):
-        recoil = 0.25 * phase(7.0)
-        ar = (ar[0] + recoil, ar[1] - 0.15 * recoil)
+        rec = 0.018 * h * phase(7.0)
+        fal = (fal[0] + rec, fal[1])
+        far = (far[0] + rec, far[1])
 
-    def off(base, o):
-        return (base[0] + o[0] * r, base[1] + o[1] * r)
+    bone_w = max(LW, 0.028 * h)
 
-    stroke(d, [hip, off(hip, ll)], outline)
-    stroke(d, [hip, off(hip, lr)], outline)
-    stroke(d, [neck, hip], outline)
-    stroke(d, [neck, off(neck, al)], outline)
-    stroke(d, [neck, off(neck, ar)], outline)
+    def bone(base, v1, v2):
+        """Two sticks joined by an ink dot; returns the end point."""
+        elbow = (base[0] + v1[0], base[1] + v1[1])
+        end = (elbow[0] + v2[0], elbow[1] + v2[1])
+        stroke(d, [base, elbow], fill, bone_w)
+        stroke(d, [elbow, end], fill, bone_w)
+        dot(d, elbow[0], elbow[1], bone_w * 0.55, INK)
+        return end
+
+    # limbs go down first so the torso can cover the joints at the root
+    foot_l = bone(hips[0], thl, shl)
+    foot_r = bone(hips[1], thr, shr)
+    for fx, fy in (foot_l, foot_r):
+        d.ellipse([px(fx - 0.038 * h), px(fy - 0.016 * h),
+                   px(fx + 0.052 * h), px(fy + 0.016 * h)], fill=INK)
+    hand_l = bone(shoulders[0], ual, fal)
+    hand_r = bone(shoulders[1], uar, far)
+
+    # torso block (rounded rectangle), then neck and head
+    shape(d, "rrect", (x - 0.145 * h, sy - 0.015 * h,
+                       x + 0.145 * h, hy + 0.055 * h),
+          fill=fill, outline=outline, w=int(LW * 1.2))
+    stroke(d, [(x, head[1] + r * 0.85), (x, sy)], outline, LW * 1.6)
+    for hx, hyy in (hand_l, hand_r):
+        rr = 0.024 * h
+        d.ellipse([px(hx - rr), px(hyy - rr), px(hx + rr), px(hyy + rr)],
+                  fill=PAPER, outline=INK, width=int(LW))
     d.ellipse([px(head[0] - r), px(head[1] - r), px(head[0] + r), px(head[1] + r)],
               fill=head_fill or fill, outline=outline, width=int(LW))
     if eyes:
