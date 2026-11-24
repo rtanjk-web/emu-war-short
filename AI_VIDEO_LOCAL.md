@@ -10,11 +10,17 @@ machine has an RTX 2080 Ti (11 GB), which is enough for **LTX-Video 0.9.5 (2B)**
 |---|---|
 | Model | `Lightricks/LTX-Video-0.9.5` (diffusers `LTXPipeline`) |
 | Output | 512x896, 49 frames, 24 fps, 2.04 s |
-| Steps | 30 (0.89 s/step) |
-| **Generation time** | **26.8 s** (after model load) |
-| Model load / text encode | ~38 s first run (cached download), ~50 s cold; T5 ~12 s |
+| Steps | 30 (~1 s/step) |
+| **Generation time** | **26.8-30.9 s** (after model load, two runs) |
+| Model load / text encode | ~38-50 s cached / cold; T5 ~11-13 s |
 | **Peak VRAM** | **7.15 GiB** (fits an 11 GB card with room to spare) |
+| Output size | 106 KB, 419 kb/s H.264 |
 | Cost | $0, no quota, no API key |
+
+Sanity checks on the generated clip: non-static (mean frame-to-frame delta 12-13
+levels), good contrast (std 83/255), 4,299 distinct colours in a subsample — not a
+blank or frozen output. Preview it at
+`C:\Users\rapha\AppData\Local\Temp\opencode\vidgen\out\emu_ltx.mp4`.
 
 Setup on this machine:
 
