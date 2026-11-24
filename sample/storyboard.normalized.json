@@ -1,0 +1,78 @@
+{
+  "title": "The Golf Ball That Got Dents",
+  "description": "Golfers once thought smooth balls flew best, but dents create a thin turbulent layer that reduces drag and lets dimpled balls travel farther. #golf #physics #shorts",
+  "aspect": [
+    1080,
+    1920
+  ],
+  "fps": 30,
+  "style": "simple black stickman characters, round heads, dot eyes, thick outlines, flat bold backgrounds, 9:16",
+  "shots": [
+    {
+      "id": 1,
+      "seconds": 4.0,
+      "beat": "HOOK",
+      "narration": "A golfer hammered 327 dents into his new ball before a village tournament.",
+      "visual": "Stickman golfer with yellow vest swings hammer at ball on tee; sign reads 327 DENTS",
+      "camera": "zoom_in"
+    },
+    {
+      "id": 2,
+      "seconds": 4.0,
+      "beat": "SETUP",
+      "narration": "He faced the smooth-ball champion on the old hill course for a shiny silver cup.",
+      "visual": "Two stickmen face off across golf course; champion has striped cap and smooth ball; silver cup on pedestal",
+      "camera": "pan_right"
+    },
+    {
+      "id": 3,
+      "seconds": 4.0,
+      "beat": "DOUBT",
+      "narration": "The champion laughed, \"You wrecked your only ball, you clown.\"",
+      "visual": "Champion points and laughs; dented ball looks rough on ground",
+      "camera": "zoom_in"
+    },
+    {
+      "id": 4,
+      "seconds": 4.0,
+      "beat": "ESCALATE",
+      "narration": "On the first drive, the smooth ball flew far, but the dented ball rolled past it.",
+      "visual": "Two balls in flight over hills; dented ball overtakes smooth ball",
+      "camera": "pan_left"
+    },
+    {
+      "id": 5,
+      "seconds": 4.0,
+      "beat": "ESCALATE",
+      "narration": "By hole 9, the champion stared as the weird ball kept sailing ahead.",
+      "visual": "Scoreboard shows hole 9; champion scratches head; golfer smiles",
+      "camera": "zoom_out"
+    },
+    {
+      "id": 6,
+      "seconds": 4.0,
+      "beat": "TURN",
+      "narration": "Then a hard wind blasted across the final hill toward the flag.",
+      "visual": "Wind lines sweep across hill; flag bends; both golfers brace",
+      "camera": "pan_right"
+    },
+    {
+      "id": 7,
+      "seconds": 4.0,
+      "beat": "REVEAL",
+      "narration": "You see, tiny dents make air cling to the ball and cut drag through the wind.",
+      "visual": "Simple diagram: ball with dimples and airflow lines hugging surface, arrow shows less drag",
+      "camera": "zoom_in"
+    },
+    {
+      "id": 8,
+      "seconds": 4.0,
+      "beat": "BUTTON",
+      "narration": "The dented ball dropped beside the flag, and the champion demanded 327 dents.",
+      "visual": "Dented ball lands next to flag; champion holds hammer over smooth ball while golfer holds trophy",
+      "camera": "zoom_out"
+    }
+  ],
+  "total_seconds": 32.0,
+  "word_count": 108
+}

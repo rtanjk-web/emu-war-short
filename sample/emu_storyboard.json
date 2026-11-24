@@ -1,0 +1,208 @@
+{
+  "title": "Australia Declared War on Birds",
+  "description": "In 1932, Australia sent soldiers with machine guns to fight twenty thousand emus. The emus won. #history #australia #emuwars",
+  "aspect": [
+    1080,
+    1920
+  ],
+  "fps": 30,
+  "voice": "Charon",
+  "style_note": "fast, punchy documentary narrator, dry, clipped delivery",
+  "style": "simple black stickman characters, round heads, dot eyes, thick outlines, flat bold backgrounds, 9:16",
+  "shots": [
+    {
+      "id": 1,
+      "beat": "HOOK",
+      "narration": "Australia once declared war on birds. It took ten bullets to kill one.",
+      "scenes": [
+        "1b",
+        "1a"
+      ],
+      "moves": [
+        "zoom_in",
+        "pan_right"
+      ],
+      "split": 0.52,
+      "focus": [
+        [
+          540,
+          720
+        ],
+        [
+          540,
+          1060
+        ]
+      ]
+    },
+    {
+      "id": 2,
+      "beat": "SETUP",
+      "narration": "Twenty thousand emus marched into the wheat belt and tore down the fences.",
+      "scenes": [
+        "2a",
+        "2b"
+      ],
+      "moves": [
+        "diagonal",
+        "zoom_in"
+      ],
+      "split": 0.56,
+      "focus": [
+        [
+          540,
+          1060
+        ],
+        [
+          540,
+          1020
+        ]
+      ]
+    },
+    {
+      "id": 3,
+      "beat": "DOUBT",
+      "narration": "Farmers begged for help. The government sent two soldiers and two machine guns.",
+      "scenes": [
+        "3a",
+        "3b"
+      ],
+      "moves": [
+        "zoom_out",
+        "zoom_in"
+      ],
+      "split": 0.55,
+      "focus": [
+        [
+          540,
+          900
+        ],
+        [
+          540,
+          870
+        ]
+      ]
+    },
+    {
+      "id": 4,
+      "beat": "ESCALATE",
+      "narration": "They waited at a watering hole for the flock to crowd in.",
+      "scenes": [
+        "4a",
+        "4b"
+      ],
+      "moves": [
+        "pan_left",
+        "diagonal"
+      ],
+      "split": 0.55,
+      "focus": [
+        [
+          540,
+          1120
+        ],
+        [
+          540,
+          1060
+        ]
+      ]
+    },
+    {
+      "id": 5,
+      "beat": "ESCALATE",
+      "narration": "The first burst jammed. The emus scattered in every direction.",
+      "scenes": [
+        "5a",
+        "5b"
+      ],
+      "moves": [
+        "zoom_out",
+        "pan_left"
+      ],
+      "split": 0.5,
+      "focus": [
+        [
+          540,
+          970
+        ],
+        [
+          540,
+          1020
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "beat": "TURN",
+      "narration": "Nine thousand eight hundred rounds later, they had killed fewer than a thousand.",
+      "scenes": [
+        "6a",
+        "6b"
+      ],
+      "moves": [
+        "zoom_in",
+        "pan_right"
+      ],
+      "split": 0.54,
+      "focus": [
+        [
+          540,
+          940
+        ],
+        [
+          540,
+          720
+        ]
+      ]
+    },
+    {
+      "id": 7,
+      "beat": "REVEAL",
+      "narration": "You see, there was never a line to break. The birds just went around it.",
+      "scenes": [
+        "7a",
+        "7b"
+      ],
+      "moves": [
+        "zoom_out",
+        "diagonal"
+      ],
+      "split": 0.56,
+      "focus": [
+        [
+          540,
+          820
+        ],
+        [
+          540,
+          920
+        ]
+      ],
+      "tempo": 0.93
+    },
+    {
+      "id": 8,
+      "beat": "BUTTON",
+      "narration": "The army quit. The emus kept the field. Australia still calls it the Emu War.",
+      "scenes": [
+        "8a",
+        "8b"
+      ],
+      "moves": [
+        "pan_left",
+        "zoom_in"
+      ],
+      "split": 0.58,
+      "focus": [
+        [
+          540,
+          970
+        ],
+        [
+          540,
+          670
+        ]
+      ]
+    }
+  ],
+  "tts_model": "gemini-3.8-flash-lite-tts"
+}

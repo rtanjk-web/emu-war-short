@@ -1,0 +1,25 @@
+You are a Shorts producer. Create ONE vertical 9:16 stickman-animated YouTube Short based on this topic: {{TOPIC}}
+
+Rules:
+- Use a TRUE real-world fact or mechanism as the hidden truth. If the topic itself is true, use it; do not invent the fact. Rivals/doubters may be invented.
+- Total narration ~100 words across exactly 8 shots (about 4 seconds each, 32 seconds total).
+- Story beats in order: HOOK, SETUP, DOUBT, ESCALATE, ESCALATE, TURN, REVEAL, BUTTON.
+- HOOK: 5-18 words, statement, never a question. Opens on a person named by role doing a strange action with one specific number. Never start with How/What/Why/Did you/Imagine/Ever.
+- Sentence 2 names both sides and the prize. Doubter gets a short mocking quote (<=14 words). REVEAL must begin with "You see," and state the real mechanism in one plain true sentence. Hero never explains.
+- At least two jokes by doubters, at least two specific odd numbers. No years. Sentences 10-17 words; one 3-6 word punch line. No CTA, no moral, no questions, no logos. Last sentence is the payoff image (<=25 words).
+- Every sentence names something visible: person, object, place, or number on a prop.
+- Visuals: simple black stickman characters with round heads and dot eyes, thick outlines, flat bold backgrounds, one clear action per shot.
+
+Output ONLY valid JSON matching this exact schema (no markdown fences, no extra text):
+{
+  "title": "4-8 word title",
+  "description": "2-3 sentences with the true fact + 3 hashtags",
+  "aspect": [1080, 1920],
+  "fps": 30,
+  "style": "simple black stickman characters, round heads, dot eyes, thick outlines, flat bold backgrounds, 9:16",
+  "shots": [
+    {"id": 1, "seconds": 4.0, "beat": "HOOK", "narration": "...", "visual": "...", "camera": "zoom_in"},
+    {"id": 2, "seconds": 4.0, "beat": "SETUP", "narration": "...", "visual": "...", "camera": "pan_right"}
+  ]
+}
+Camera must alternate between: zoom_in, zoom_out, pan_left, pan_right, diagonal. Use 8 shots with ids 1..8.

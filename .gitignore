@@ -1,0 +1,33 @@
+# secrets - never commit
+.env
+*.key
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# render intermediates (rebuilt on every run)
+sample/emu/segments/
+sample/emu/video_silent.mp4
+sample/emu/mix.wav
+sample/emu/timing.json
+sample/emu/preview_*.png
+sample/emu/emu_war_short.mp4
+
+# TTS response cache - regenerated on demand, vo_*.wav is the committed master
+sample/emu/audio/tts_*.wav
+sample/emu/audio/*.full.wav
+
+# old prototype animatic (superseded by sample/emu/)
+sample/animatic.mp4
+sample/animatic_silent.mp4
+sample/shot_*.mp4
+sample/voiceover_silent.wav
+sample/concat.txt
+sample/assets/
+
+# OS noise
+Thumbs.db
+.DS_Store
