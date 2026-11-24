@@ -38,6 +38,13 @@ git status --short | Select-String ".env"
 
 `.env` is in `.gitignore`; the scripts only read the key from the environment.
 
+## Verified locally
+
+The committed tree was cloned into an empty directory (46 files, 1.68 MB, no `.env`)
+and rendered with `--offline`: 148 s on this machine, producing a 35.37 s,
+1080x1920/30 fps, 33.17 MB MP4. That clone is exactly what Actions checks out, so
+the job has no hidden dependency on local files or API quota.
+
 ## Render
 
 - **Actions → render-short → Run workflow**, or push any change to
